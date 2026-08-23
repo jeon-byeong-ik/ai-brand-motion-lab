@@ -32,6 +32,7 @@
   html { background: var(--page); }
   body {
     margin: 0;
+    overflow-x: hidden;
     color: var(--text);
     background:
       radial-gradient(circle at 18% -10%, rgba(23, 112, 221, .16), transparent 30%),
@@ -341,6 +342,14 @@
     background: rgba(7, 11, 18, .92);
   }
   .top-left, .top-right { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .mobile-brand { display: none; min-width: 0; align-items: center; gap: 8px; }
+  .mobile-brand .brand-mark { width: 30px; height: 30px; }
+  .mobile-brand .brand-current .brand-mark { width: 28px; height: 28px; border-radius: 9px; }
+  .mobile-brand .brand-current .current-mark::after { inset: 6px; }
+  .mobile-brand-copy { min-width: 0; line-height: 1.05; }
+  .mobile-brand-copy small { display: block; color: #6f829a; font-size: 7px; letter-spacing: .1em; }
+  .mobile-brand-copy strong { display: block; margin-top: 3px; color: #edf5ff; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .mobile-brand-copy strong span { color: var(--cyan); }
   .menu-button { width: 29px; height: 29px; border: 0; color: #8ca0b7; background: transparent; font-size: 17px; }
   .search { min-height: 34px; display: flex; align-items: center; gap: 7px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; color: #7d8ea4; background: #0c131e; font-size: 10px; }
   .search kbd { padding: 2px 5px; border-radius: 5px; color: #586a80; background: #131d2a; font-size: 8px; }
@@ -533,7 +542,7 @@
     .logo-card { min-height: 120px; }
   }
 
-  @media (max-width: 620px) {
+  @media (max-width: 720px) {
     .review-bar { position: relative; }
     .review-id small { display: none; }
     .review-controls { align-items: stretch; flex-direction: column; }
@@ -545,14 +554,59 @@
     .sidebar, .history { display: none; }
     .topbar { grid-column: 1; grid-row: 1; min-height: 62px; padding: 0 11px; }
     .workspace { grid-column: 1; grid-row: 2; }
+    .mobile-brand { display: flex; }
     .search { width: 32px; justify-content: center; padding: 0; }
     .search span, .search kbd, .user-copy { display: none; }
     .user { padding: 3px; border: 0; background: transparent; }
-    .messages { width: calc(100% - 24px); padding-top: 20px; }
+    .messages { width: calc(100% - 24px); padding: 20px 0 170px; overflow-y: auto; }
+    .console[data-brand="current"] .messages { width: calc(100% - 24px); padding: 20px 0 16px; overflow-y: auto; }
     .bubble { max-width: 88%; padding: 12px 13px; }
     .processing-stage { padding-top: 70px; }
     .composer { width: calc(100% - 20px); }
+    .console[data-brand="current"] .current-composer { padding: 10px 10px 12px; }
     .tool:nth-of-type(3) { display: none; }
+  }
+
+  @media (max-width: 420px) {
+    .review-bar { gap: 10px; padding: 10px 12px; }
+    .review-id { width: 100%; }
+    .review-controls { gap: 7px; }
+    .segment button { min-width: 0; padding: 0 4px; font-size: 9px; }
+    .review-page { padding: 14px 8px 30px; }
+    .review-heading p, .review-badge { display: none; }
+    .review-heading { margin-bottom: 10px; }
+    .review-heading h1 { font-size: 18px; }
+    .console { min-height: 680px; border-radius: 12px; }
+    .topbar { gap: 6px; padding: 0 8px; }
+    .top-left, .top-right { gap: 6px; }
+    .search, .connected, .current-theme { display: none !important; }
+    .menu-button { width: 27px; }
+    .mobile-brand { gap: 6px; }
+    .mobile-brand .brand-mark { width: 27px; height: 27px; }
+    .mobile-brand .brand-current .brand-mark { width: 26px; height: 26px; }
+    .mobile-brand-copy strong { font-size: 10px; }
+    .message { gap: 7px; margin-bottom: 18px; }
+    .bubble { max-width: calc(100% - 34px); padding: 10px 11px; font-size: 10px; }
+    .assistant-avatar, .user-avatar,
+    .console[data-brand="current"] .assistant-avatar { width: 25px; height: 25px; }
+    .processing-stage { width: calc(100% - 24px); padding-top: 56px; }
+    .processing-logo { width: 96px; height: 96px; }
+    .processing-logo .brand-mark { width: 72px; height: 72px; }
+    .processing-stage h2 { font-size: 18px; }
+    .processing-steps { gap: 4px; }
+    .processing-step { padding: 0 7px; font-size: 8px; }
+    .composer { bottom: 10px; width: calc(100% - 16px); }
+    .compose-main { min-height: 48px; gap: 5px; padding: 0 5px; }
+    .compose-main input { font-size: 10px; }
+    .compose-tools { padding-inline: 4px; }
+    .tool { padding-inline: 5px; }
+    .model { display: none; }
+    .current-options { gap: 5px; padding-inline: 4px; }
+    .current-tags { padding-inline: 4px; }
+    .current-tag:not(.active) { display: none; }
+    .section-head { align-items: flex-start; flex-direction: column; }
+    .logo-card { padding: 12px; }
+    .logo-card footer { flex-wrap: wrap; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -612,7 +666,15 @@
     </aside>
 
     <header class="topbar">
-      <div class="top-left"><button class="menu-button" type="button" aria-label="메뉴">☰</button><div class="search">⌕ <span>Search</span><kbd>⌘K</kbd></div></div>
+      <div class="top-left">
+        <button class="menu-button" type="button" aria-label="메뉴">☰</button>
+        <div class="mobile-brand" aria-label="현재 선택된 브랜드">
+          <span class="brand-current"><span class="brand-mark current-mark" aria-hidden="true"><svg class="current-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></span><span class="mobile-brand-copy"><small>LTIS</small><strong>AI Ops Console</strong></span></span>
+          <span class="brand-flow"><span class="brand-mark"><svg class="mark-svg" viewBox="0 0 100 100" aria-hidden="true"><path class="flow-base" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7M31 87C43 65 55 39 74 14C87 40 91 63 97 85M22 67C49 68 68 55 87 37"/><path class="flow-active" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7"/><path class="flow-head" d="M79 34L93 31L88 45Z"/></svg></span><span class="mobile-brand-copy"><small>LTIS AI WORKSPACE</small><strong>Meta<span>AI</span>DE</strong></span></span>
+          <span class="brand-circuit"><span class="brand-mark"><svg class="mark-svg" viewBox="0 0 100 100" aria-hidden="true"><path class="circuit-body" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31"/><path class="circuit-line" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31"/></svg></span><span class="mobile-brand-copy"><small>LTIS AI WORKSPACE</small><strong>Meta<span>AI</span>DE</strong></span></span>
+        </div>
+        <div class="search">⌕ <span>Search</span><kbd>⌘K</kbd></div>
+      </div>
       <div class="top-right"><span class="current-theme current-ui" aria-label="테마">☼</span><span class="connected proposed-ui">LTIS 운영 연결됨</span><div class="user"><span class="user-copy"><strong>System Admin</strong><small>ADMIN</small></span><span class="avatar">SA</span></div></div>
     </header>
 
