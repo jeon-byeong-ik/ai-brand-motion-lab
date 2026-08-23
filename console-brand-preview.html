@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>LTIS Console Brand Preview</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --page: #050812;
+    --page-soft: #080d18;
+    --surface: #0a101b;
+    --surface-2: #0e1623;
+    --surface-3: #121c2b;
+    --line: rgba(145, 174, 211, .13);
+    --line-strong: rgba(145, 188, 230, .25);
+    --text: #edf5ff;
+    --copy: #a9b9cb;
+    --muted: #65778f;
+    --cyan: #24e5d1;
+    --blue: #32a7ff;
+    --deep-blue: #1670dd;
+    --orange: #ff6846;
+    --yellow: #ffc83d;
+    --green: #47dfa2;
+    --motion-duration: 1.5s;
+    font-family: Pretendard, "Noto Sans KR", "Segoe UI", Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html { background: var(--page); }
+  body {
+    margin: 0;
+    color: var(--text);
+    background:
+      radial-gradient(circle at 18% -10%, rgba(23, 112, 221, .16), transparent 30%),
+      radial-gradient(circle at 86% 14%, rgba(36, 229, 209, .08), transparent 26%),
+      var(--page);
+  }
+
+  button, select, input { font: inherit; }
+  button, a, select { -webkit-tap-highlight-color: transparent; }
+  button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 2px;
+  }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+  .review-bar {
+    position: sticky;
+    z-index: 100;
+    top: 0;
+    display: flex;
+    min-height: 58px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 9px clamp(14px, 3vw, 30px);
+    border-bottom: 1px solid var(--line);
+    background: rgba(5, 8, 18, .88);
+    backdrop-filter: blur(18px) saturate(140%);
+  }
+
+  .review-id, .review-links, .review-controls, .segment { display: flex; align-items: center; }
+  .review-id { gap: 11px; white-space: nowrap; }
+  .review-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 14px rgba(36, 229, 209, .75);
+  }
+  .review-id strong { font-size: 13px; font-weight: 600; }
+  .review-id small { color: var(--muted); font-size: 10px; letter-spacing: .08em; }
+  .review-links { gap: 4px; }
+  .review-links a {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 10px;
+    border-radius: 9px;
+    color: var(--copy);
+    font-size: 11px;
+    text-decoration: none;
+  }
+  .review-links a:hover { color: var(--text); background: rgba(255, 255, 255, .05); }
+  .review-controls { gap: 9px; margin-left: auto; }
+  .segment {
+    gap: 3px;
+    padding: 3px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: rgba(13, 21, 34, .8);
+  }
+  .segment button {
+    min-height: 29px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 7px;
+    color: var(--muted);
+    background: transparent;
+    font-size: 10px;
+    cursor: pointer;
+  }
+  .segment button[aria-pressed="true"] {
+    color: var(--text);
+    background: #192638;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .18);
+  }
+  .speed-select {
+    min-height: 35px;
+    padding: 0 28px 0 10px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    color: var(--copy);
+    background: #0d1522;
+    font-size: 10px;
+  }
+
+  .review-page { width: min(1640px, 100%); margin: 0 auto; padding: 18px clamp(12px, 2.3vw, 30px) 44px; }
+  .review-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 13px;
+  }
+  .review-heading h1 { margin: 0; font-size: clamp(18px, 2vw, 25px); font-weight: 600; letter-spacing: -.035em; }
+  .review-heading p { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+  .review-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #91a5bd;
+    font-size: 9px;
+    letter-spacing: .07em;
+  }
+  .review-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+  .console {
+    position: relative;
+    min-height: 700px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 214px 218px minmax(0, 1fr);
+    border: 1px solid var(--line-strong);
+    border-radius: 15px;
+    background: #070c14;
+    box-shadow: 0 26px 90px rgba(0, 0, 0, .36);
+    isolation: isolate;
+  }
+
+  .sidebar, .history {
+    position: relative;
+    z-index: 4;
+    min-width: 0;
+    border-right: 1px solid var(--line);
+    background: #0a0f19;
+  }
+  .sidebar { display: flex; flex-direction: column; }
+  .brand-slot {
+    min-height: 74px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brand-mark { position: relative; width: 43px; height: 43px; flex: 0 0 auto; }
+  .current-mark {
+    display: grid;
+    place-items: center;
+    border-radius: 15px;
+    background: radial-gradient(circle, rgba(27, 234, 209, .23), rgba(11, 58, 70, .78) 54%, #07121c 75%);
+    box-shadow: inset 0 0 0 1px rgba(37, 231, 211, .24), 0 0 20px rgba(25, 211, 198, .16);
+  }
+  .current-mark::before, .current-mark::after {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--cyan);
+    transform: rotate(45deg);
+  }
+  .current-mark::after { width: 7px; height: 7px; border-radius: 50%; box-shadow: 0 0 8px var(--cyan); }
+
+  .mark-svg { width: 100%; height: 100%; overflow: visible; }
+  .flow-base, .circuit-body {
+    fill: none;
+    stroke: rgba(76, 139, 190, .34);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .flow-base { stroke-width: 6; }
+  .flow-active {
+    fill: none;
+    stroke: url(#flow-gradient);
+    stroke-width: 7;
+    stroke-linecap: round;
+    stroke-dasharray: 25 155;
+    filter: drop-shadow(0 0 6px rgba(36, 229, 209, .52));
+  }
+  .flow-head { fill: var(--orange); filter: drop-shadow(0 0 7px rgba(255, 104, 70, .45)); }
+  .circuit-body { stroke: var(--blue); stroke-width: 5; }
+  .circuit-line {
+    fill: none;
+    stroke: url(#circuit-gradient);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 15 80;
+  }
+  .circuit-node { fill: var(--orange); stroke: #eefaff; stroke-width: 1.2; }
+
+  .console.is-processing .flow-active { animation: flow-run var(--motion-duration) linear infinite; }
+  .console.is-processing .flow-head { animation: flow-head var(--motion-duration) ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .console.is-processing .circuit-line { animation: circuit-run var(--motion-duration) linear infinite; }
+  .console.is-processing .circuit-node { animation: circuit-node var(--motion-duration) ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .console.is-processing .circuit-node.n2 { animation-delay: calc(var(--motion-duration) * -.33); }
+  .console.is-processing .circuit-node.n3 { animation-delay: calc(var(--motion-duration) * -.66); }
+
+  @keyframes flow-run { from { stroke-dashoffset: 180; } to { stroke-dashoffset: -180; } }
+  @keyframes flow-head { 0%, 55%, 100% { transform: translate(-2px, 2px) scale(.86); opacity: .5; } 72% { transform: translate(2px, -2px) scale(1.16); opacity: 1; } }
+  @keyframes circuit-run { from { stroke-dashoffset: 95; } to { stroke-dashoffset: -95; } }
+  @keyframes circuit-node { 0%, 68%, 100% { transform: scale(.7); opacity: .35; } 18%, 38% { transform: scale(1.22); opacity: 1; } }
+
+  .brand-copy { min-width: 0; }
+  .brand-copy small { display: block; margin-bottom: 3px; color: #718199; font-size: 9px; letter-spacing: .13em; }
+  .brand-copy strong { display: block; color: #f4f8ff; font-size: 14px; font-weight: 600; white-space: nowrap; }
+  .brand-copy .meta-word { font-size: 18px; letter-spacing: -.045em; }
+  .brand-copy .meta-word span { color: var(--cyan); }
+  .brand-current, .brand-flow, .brand-circuit { display: none; }
+  .console[data-brand="current"] .brand-current,
+  .console[data-brand="flow"] .brand-flow,
+  .console[data-brand="circuit"] .brand-circuit { display: flex; }
+
+  .nav-scroll { flex: 1; padding: 14px 10px 18px; }
+  .nav-label { margin: 0 9px 8px; color: #5e6f85; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; }
+  .nav-label:not(:first-child) { margin-top: 18px; }
+  .nav-item {
+    width: 100%;
+    min-height: 39px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 10px;
+    color: #8b9bb0;
+    background: transparent;
+    text-align: left;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .nav-icon {
+    width: 18px;
+    height: 18px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    color: #70849b;
+    font-size: 11px;
+    font-style: normal;
+  }
+  .nav-item.active { color: var(--cyan); background: rgba(24, 198, 184, .12); box-shadow: inset 2px 0 0 var(--cyan); }
+  .nav-footer { min-height: 45px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; border-top: 1px solid var(--line); color: #506075; font-size: 9px; }
+  .endorsement { color: #6f83a0; }
+  .console:not([data-brand="current"]) .endorsement { color: #83a9d4; }
+
+  .history { background: #080d15; }
+  .history-head { min-height: 74px; display: flex; align-items: center; justify-content: space-between; padding: 0 13px; border-bottom: 1px solid var(--line); color: #8fa6c0; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+  .history-actions { display: flex; gap: 5px; }
+  .icon-button {
+    width: 27px;
+    height: 27px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: #8ca0b7;
+    background: #0d1420;
+    cursor: pointer;
+  }
+  .conversation {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 13px;
+    color: #dce7f4;
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .conversation span { overflow: hidden; text-overflow: ellipsis; }
+  .conversation.active { background: #162234; box-shadow: inset 2px 0 0 var(--cyan); }
+
+  .workspace { min-width: 0; position: relative; display: flex; flex-direction: column; overflow: hidden; background: #070b12; }
+  .topbar {
+    min-height: 74px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 0 17px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(7, 11, 18, .92);
+  }
+  .top-left, .top-right { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .menu-button { width: 29px; height: 29px; border: 0; color: #8ca0b7; background: transparent; font-size: 17px; }
+  .search { min-height: 34px; display: flex; align-items: center; gap: 7px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; color: #7d8ea4; background: #0c131e; font-size: 10px; }
+  .search kbd { padding: 2px 5px; border-radius: 5px; color: #586a80; background: #131d2a; font-size: 8px; }
+  .connected { display: inline-flex; align-items: center; gap: 6px; color: #7f93aa; font-size: 9px; white-space: nowrap; }
+  .connected::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 7px rgba(71, 223, 162, .7); }
+  .user { min-height: 35px; display: flex; align-items: center; gap: 8px; padding: 3px 5px 3px 10px; border: 1px solid var(--line); border-radius: 10px; background: #0c131e; }
+  .user-copy { text-align: right; }
+  .user-copy strong { display: block; font-size: 9px; font-weight: 600; }
+  .user-copy small { display: block; color: #61748c; font-size: 8px; }
+  .avatar { width: 27px; height: 27px; display: grid; place-items: center; border-radius: 9px; color: var(--cyan); background: rgba(30, 205, 188, .13); font-size: 9px; }
+
+  .chat-stage {
+    position: relative;
+    min-height: 0;
+    flex: 1;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 54% 26%, rgba(32, 136, 235, .055), transparent 28%),
+      linear-gradient(rgba(78, 123, 174, .025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(78, 123, 174, .025) 1px, transparent 1px);
+    background-size: auto, 44px 44px, 44px 44px;
+  }
+  .messages { width: min(760px, calc(100% - 50px)); margin: 0 auto; padding: 28px 0 190px; }
+  .message { display: flex; gap: 10px; margin-bottom: 24px; }
+  .message.user-message { justify-content: flex-end; }
+  .bubble { max-width: min(610px, 78%); padding: 14px 17px; border: 1px solid var(--line); border-radius: 15px; color: #dce8f5; background: #0d1420; font-size: 11px; line-height: 1.7; }
+  .user-message .bubble { color: #03221f; border-color: transparent; background: linear-gradient(135deg, #28d9c6, #1db8b2); }
+  .assistant-avatar { width: 30px; height: 30px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 10px; color: var(--cyan); background: #101a28; }
+  .assistant-avatar .brand-mark { width: 22px; height: 22px; }
+  .assistant-avatar .current-mark { border-radius: 8px; }
+  .assistant-avatar .current-mark::before { width: 10px; height: 10px; }
+  .assistant-avatar .current-mark::after { width: 4px; height: 4px; }
+  .bubble b { color: #f5f8fc; font-weight: 600; }
+  .bubble code { padding: 2px 5px; border-radius: 4px; color: #bbd7ed; background: #172231; font-family: Consolas, monospace; }
+
+  .processing-stage { display: none; width: min(620px, calc(100% - 36px)); margin: 0 auto; padding: 78px 0 200px; text-align: center; }
+  .console.is-processing .messages { display: none; }
+  .console.is-processing .processing-stage { display: block; }
+  .processing-logo {
+    width: 116px;
+    height: 116px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 18px;
+    border-radius: 34px;
+    background: radial-gradient(circle, rgba(27, 115, 212, .19), rgba(7, 16, 27, .28) 60%, transparent 70%);
+  }
+  .processing-logo .brand-mark { width: 88px; height: 88px; }
+  .processing-logo .current-mark { border-radius: 28px; }
+  .processing-logo .current-mark::before { width: 36px; height: 36px; }
+  .processing-logo .current-mark::after { width: 12px; height: 12px; }
+  .processing-stage h2 { margin: 0; font-size: clamp(19px, 2.4vw, 25px); font-weight: 600; letter-spacing: -.035em; }
+  .processing-stage h2 .brand-current,
+  .processing-stage h2 .brand-flow,
+  .processing-stage h2 .brand-circuit { justify-content: center; }
+  .processing-stage p { margin: 7px 0 20px; color: #7b8ea6; font-size: 10px; }
+  .processing-steps { display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 7px; }
+  .processing-step { min-height: 27px; display: inline-flex; align-items: center; gap: 6px; padding: 0 10px; border: 1px solid var(--line); border-radius: 999px; color: #73869d; background: rgba(13, 21, 34, .7); font-size: 9px; }
+  .processing-step.active { color: #b9f7ee; border-color: rgba(36, 229, 209, .25); }
+  .processing-step.active::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 7px var(--cyan); animation: status-pulse .65s ease-in-out infinite alternate; }
+  @keyframes status-pulse { to { opacity: .3; transform: scale(.7); } }
+
+  .composer {
+    position: absolute;
+    z-index: 6;
+    left: 50%;
+    bottom: 18px;
+    transform: translateX(-50%);
+    width: min(760px, calc(100% - 44px));
+    padding: 5px;
+    border: 1px solid rgba(112, 160, 205, .2);
+    border-radius: 15px;
+    background: rgba(10, 16, 26, .92);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .28);
+    backdrop-filter: blur(14px);
+  }
+  .compose-main { min-height: 52px; display: flex; align-items: center; gap: 9px; padding: 0 8px; }
+  .attach { width: 30px; height: 30px; border: 0; border-radius: 8px; color: #7589a1; background: transparent; font-size: 18px; }
+  .compose-main input { width: 100%; min-width: 0; border: 0; outline: 0; color: #dbe7f4; background: transparent; font-size: 11px; }
+  .compose-main input::placeholder { color: #4f6279; }
+  .send { width: 35px; height: 35px; flex: 0 0 auto; border: 0; border-radius: 11px; color: #03201f; background: linear-gradient(135deg, var(--cyan), var(--blue)); font-size: 18px; cursor: pointer; }
+  .compose-tools { min-height: 32px; display: flex; align-items: center; gap: 5px; padding: 3px 8px 0; border-top: 1px solid rgba(122, 158, 198, .1); }
+  .tool { min-height: 25px; padding: 0 8px; border: 0; border-radius: 7px; color: #7690aa; background: transparent; font-size: 9px; }
+  .tool.on { color: #c4f5f0; background: rgba(31, 156, 213, .1); }
+  .model { margin-left: auto; color: #71839a; font-size: 8px; }
+
+  .logo-section { margin-top: 18px; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .section-head h2 { margin: 0; font-size: 14px; font-weight: 600; }
+  .section-head p { margin: 0; color: var(--muted); font-size: 9px; }
+  .logo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .logo-card {
+    min-width: 0;
+    min-height: 146px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 15px;
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    color: var(--copy);
+    background: linear-gradient(145deg, rgba(15, 24, 38, .88), rgba(9, 15, 25, .76));
+    cursor: pointer;
+    text-align: left;
+  }
+  .logo-card[aria-pressed="true"] { border-color: rgba(36, 229, 209, .5); box-shadow: inset 0 0 0 1px rgba(36, 229, 209, .12), 0 0 28px rgba(23, 174, 175, .06); }
+  .logo-card-preview { min-height: 68px; display: flex; align-items: center; gap: 12px; }
+  .logo-card-preview .brand-mark { width: 54px; height: 54px; }
+  .logo-card-preview .brand-copy strong { font-size: 16px; }
+  .logo-card-preview .brand-copy .meta-word { font-size: 22px; }
+  .logo-card footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 10px; border-top: 1px solid var(--line); }
+  .logo-card footer strong { color: #c8d6e6; font-size: 10px; font-weight: 600; }
+  .logo-card footer span { color: #64768c; font-size: 9px; }
+  .corporate-note { margin: 10px 2px 0; color: #62758c; font-size: 9px; }
+
+  @media (max-width: 1120px) {
+    .review-bar { align-items: flex-start; flex-wrap: wrap; }
+    .review-controls { width: 100%; order: 3; margin-left: 0; }
+    .console { grid-template-columns: 178px 190px minmax(0, 1fr); }
+    .nav-item { font-size: 11px; }
+  }
+
+  @media (max-width: 820px) {
+    .review-links { display: none; }
+    .console { grid-template-columns: 68px 180px minmax(0, 1fr); }
+    .brand-slot { justify-content: center; padding: 10px 7px; }
+    .brand-copy, .nav-label, .nav-item span, .nav-footer span { display: none; }
+    .logo-card .brand-copy { display: block; }
+    .nav-item { justify-content: center; padding: 0; }
+    .brand-mark { width: 38px; height: 38px; }
+    .logo-grid { grid-template-columns: 1fr; }
+    .logo-card { min-height: 120px; }
+  }
+
+  @media (max-width: 620px) {
+    .review-bar { position: relative; }
+    .review-id small { display: none; }
+    .review-controls { align-items: stretch; flex-direction: column; }
+    .segment { display: grid; grid-template-columns: repeat(3, 1fr); }
+    .state-segment { grid-template-columns: repeat(2, 1fr); }
+    .speed-select { width: 100%; }
+    .review-heading { align-items: flex-start; flex-direction: column; }
+    .console { min-height: 720px; grid-template-columns: minmax(0, 1fr); }
+    .sidebar, .history { display: none; }
+    .topbar { min-height: 62px; padding: 0 11px; }
+    .search { width: 32px; justify-content: center; padding: 0; }
+    .search span, .search kbd, .user-copy { display: none; }
+    .user { padding: 3px; border: 0; background: transparent; }
+    .messages { width: calc(100% - 24px); padding-top: 20px; }
+    .bubble { max-width: 88%; padding: 12px 13px; }
+    .processing-stage { padding-top: 70px; }
+    .composer { width: calc(100% - 20px); }
+    .tool:nth-of-type(3) { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .console { --motion-duration: 3.6s; }
+  }
+</style>
+</head>
+<body>
+<header class="review-bar">
+  <div class="review-id"><span class="review-dot"></span><div><strong>LTIS Brand Review</strong><br><small>DRAFT · INTERACTIVE PREVIEW</small></div></div>
+  <nav class="review-links" aria-label="시안 페이지"><a href="./console-brand-preview.html" aria-current="page">운영 화면 적용</a><a href="./index.html">모션 실험실</a></nav>
+  <div class="review-controls">
+    <div class="segment brand-segment" role="group" aria-label="브랜드 시안">
+      <button type="button" data-brand="current" aria-pressed="false">현행</button>
+      <button type="button" data-brand="flow" aria-pressed="true">MetaAIDE Flow</button>
+      <button type="button" data-brand="circuit" aria-pressed="false">MetaAIDE Circuit</button>
+    </div>
+    <div class="segment state-segment" role="group" aria-label="화면 상태">
+      <button type="button" data-state="chat" aria-pressed="true">대화 화면</button>
+      <button type="button" data-state="processing" aria-pressed="false">AI 처리 중</button>
+    </div>
+    <label><span class="sr-only">모션 속도</span><select class="speed-select" id="motion-speed" aria-label="모션 속도"><option value="2.2s">기본 2.2초</option><option value="1.5s" selected>빠름 1.5초</option><option value=".9s">강조 0.9초</option></select></label>
+  </div>
+</header>
+
+<main class="review-page">
+  <div class="review-heading">
+    <div><h1>운영 콘솔 브랜드 적용 초안</h1><p>현재 LTIS 화면 구조를 유지한 상태에서 명칭·로고·AI 처리 모션의 인상을 비교합니다.</p></div>
+    <span class="review-badge">STATIC DEMO · NO PRODUCTION DATA</span>
+  </div>
+
+  <section class="console is-chat" id="console-preview" data-brand="flow" aria-label="LTIS 운영 콘솔 브랜드 시안">
+    <aside class="sidebar" aria-label="주 메뉴">
+      <div class="brand-slot brand-current"><span class="brand-mark current-mark" aria-hidden="true"></span><span class="brand-copy"><small>LTIS</small><strong>AI Ops Console</strong></span></div>
+      <div class="brand-slot brand-flow"><span class="brand-mark"><svg class="mark-svg" viewBox="0 0 100 100" role="img" aria-label="MetaAIDE Flow 로고"><defs><linearGradient id="flow-gradient" x1="12" y1="91" x2="88" y2="9"><stop stop-color="#32a7ff"/><stop offset="1" stop-color="#24e5d1"/></linearGradient></defs><path class="flow-base" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7M31 87C43 65 55 39 74 14C87 40 91 63 97 85M22 67C49 68 68 55 87 37"/><path class="flow-active" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7"/><path class="flow-active" d="M31 87C43 65 55 39 74 14C87 40 91 63 97 85"/><path class="flow-active" d="M22 67C49 68 68 55 87 37"/><path class="flow-head" d="M79 34L93 31L88 45Z"/></svg></span><span class="brand-copy"><small>LTIS AI WORKSPACE</small><strong class="meta-word">Meta<span>AI</span>DE</strong></span></div>
+      <div class="brand-slot brand-circuit"><span class="brand-mark"><svg class="mark-svg" viewBox="0 0 100 100" role="img" aria-label="MetaAIDE Circuit 로고"><defs><linearGradient id="circuit-gradient" x1="15" y1="90" x2="82" y2="9"><stop stop-color="#32a7ff"/><stop offset="1" stop-color="#24e5d1"/></linearGradient></defs><path class="circuit-body" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31M33 67L22 57M71 67L82 57"/><path class="circuit-line" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31M33 67L22 57M71 67L82 57"/><circle class="circuit-node n1" cx="18" cy="87" r="4"/><circle class="circuit-node n2" cx="61" cy="31" r="4"/><circle class="circuit-node n3" cx="86" cy="87" r="4"/></svg></span><span class="brand-copy"><small>LTIS AI WORKSPACE</small><strong class="meta-word">Meta<span>AI</span>DE</strong></span></div>
+
+      <div class="nav-scroll">
+        <div class="nav-label">Workspace</div>
+        <button class="nav-item active" type="button"><i class="nav-icon">□</i><span>Chat</span></button>
+        <button class="nav-item" type="button"><i class="nav-icon">▦</i><span>Dashboard</span></button>
+        <button class="nav-item" type="button"><i class="nav-icon">▤</i><span>Meetings</span></button>
+        <button class="nav-item" type="button"><i class="nav-icon">▣</i><span>Knowledge</span></button>
+        <button class="nav-item" type="button"><i class="nav-icon">↶</i><span>프로젝트 히스토리</span></button>
+        <button class="nav-item" type="button"><i class="nav-icon">◇</i><span>서비스요청 품질</span></button>
+        <div class="nav-label">AI 도구</div>
+        <button class="nav-item" type="button"><i class="nav-icon">△</i><span>서비스요청 답변 추천</span></button>
+        <button class="nav-item" type="button"><i class="nav-icon">≡</i><span>ADDT 초안 생성</span></button>
+        <button class="nav-item" type="button"><i class="nav-icon">◉</i><span>SQL 쿼리 초안 생성</span></button>
+        <button class="nav-item" type="button"><i class="nav-icon">✓</i><span>QA 테스트케이스</span></button>
+        <button class="nav-item" type="button"><i class="nav-icon">✦</i><span>코드 제안 (SR 기반)</span></button>
+        <button class="nav-item" type="button"><i class="nav-icon">◇</i><span>설계 산출물 생성</span></button>
+      </div>
+      <div class="nav-footer"><span>Draft 0.1</span><b class="endorsement">by Metanet</b></div>
+    </aside>
+
+    <aside class="history" aria-label="대화 목록">
+      <div class="history-head"><span>Conversations</span><div class="history-actions"><button class="icon-button" type="button" aria-label="전체 삭제">⌫</button><button class="icon-button" type="button" aria-label="새 대화">＋</button></div></div>
+      <div class="conversation active">□ <span>서비스 요청 답변 초안...</span></div>
+      <div class="conversation">□ <span>배치 오류 원인 분석</span></div>
+      <div class="conversation">□ <span>변경 영향도 조사...</span></div>
+      <div class="conversation">□ <span>화면 목록 및 연계 확인...</span></div>
+      <div class="conversation">□ <span>SQL 보안 규칙 점검...</span></div>
+    </aside>
+
+    <section class="workspace">
+      <header class="topbar">
+        <div class="top-left"><button class="menu-button" type="button" aria-label="메뉴">☰</button><div class="search">⌕ <span>Search</span><kbd>⌘K</kbd></div></div>
+        <div class="top-right"><span class="connected">LTIS 운영 연결됨</span><div class="user"><span class="user-copy"><strong>System Admin</strong><small>ADMIN</small></span><span class="avatar">SA</span></div></div>
+      </header>
+
+      <div class="chat-stage">
+        <div class="messages">
+          <article class="message user-message"><div class="bubble">서비스 요청 내용을 분석해서 사용자 답변 초안을 만들어 주세요.</div></article>
+          <article class="message assistant-message">
+            <div class="assistant-avatar">
+              <span class="brand-mark current-mark brand-current" aria-hidden="true"></span>
+              <span class="brand-mark brand-flow"><svg class="mark-svg" viewBox="0 0 100 100" aria-hidden="true"><path class="flow-base" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7M31 87C43 65 55 39 74 14C87 40 91 63 97 85M22 67C49 68 68 55 87 37"/><path class="flow-active" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7"/></svg></span>
+              <span class="brand-mark brand-circuit"><svg class="mark-svg" viewBox="0 0 100 100" aria-hidden="true"><path class="circuit-body" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31"/><path class="circuit-line" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31"/></svg></span>
+            </div>
+            <div class="bubble">관련 업무 규칙과 최근 변경 이력을 확인했습니다.<br><br><b>1. 요청 분류</b><br>• 현상과 영향 범위를 기준으로 <code>처리 유형</code>을 구분합니다.<br><br><b>2. 확인 항목</b><br>• 재현 조건, 데이터 상태, 선행 작업 여부를 순서대로 점검합니다.</div>
+          </article>
+          <article class="message user-message"><div class="bubble">변경 대상 프로그램과 테스트 항목도 함께 정리해 주세요.</div></article>
+        </div>
+
+        <div class="processing-stage">
+          <div class="processing-logo">
+            <span class="brand-mark current-mark brand-current" aria-hidden="true"></span>
+            <span class="brand-mark brand-flow"><svg class="mark-svg" viewBox="0 0 100 100" aria-hidden="true"><path class="flow-base" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7M31 87C43 65 55 39 74 14C87 40 91 63 97 85M22 67C49 68 68 55 87 37"/><path class="flow-active" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7"/><path class="flow-active" d="M31 87C43 65 55 39 74 14C87 40 91 63 97 85"/><path class="flow-active" d="M22 67C49 68 68 55 87 37"/><path class="flow-head" d="M79 34L93 31L88 45Z"/></svg></span>
+            <span class="brand-mark brand-circuit"><svg class="mark-svg" viewBox="0 0 100 100" aria-hidden="true"><path class="circuit-body" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31M33 67L22 57M71 67L82 57"/><path class="circuit-line" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31M33 67L22 57M71 67L82 57"/><circle class="circuit-node n1" cx="18" cy="87" r="4"/><circle class="circuit-node n2" cx="61" cy="31" r="4"/><circle class="circuit-node n3" cx="86" cy="87" r="4"/></svg></span>
+          </div>
+          <h2><span class="brand-current">AI가 답변을 준비하고 있습니다</span><span class="brand-flow">MetaAIDE가 업무 맥락을 분석하고 있습니다</span><span class="brand-circuit">MetaAIDE 엔진이 관련 지식을 연결하고 있습니다</span></h2>
+          <p>서비스 요청, 업무 규칙, 변경 이력을 순서대로 확인합니다.</p>
+          <div class="processing-steps"><span class="processing-step">질문 이해</span><span class="processing-step active">업무 지식 검색</span><span class="processing-step">답변 검증</span></div>
+        </div>
+
+        <div class="composer">
+          <div class="compose-main"><button class="attach" type="button" aria-label="파일 첨부">＋</button><input aria-label="메시지" placeholder="LTIS 업무나 코드에 대해 질문하세요"><button class="send" id="processing-toggle" type="button" aria-label="AI 처리 상태 전환">↑</button></div>
+          <div class="compose-tools"><button class="tool on" type="button">지식 연결</button><button class="tool on" type="button">도구 사용</button><button class="tool" type="button">service_requests</button><span class="model">META AI · Balanced</span></div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <section class="logo-section" aria-labelledby="logo-title">
+    <div class="section-head"><h2 id="logo-title">로고 적용 방향</h2><p>카드를 누르면 운영 화면에 즉시 반영됩니다.</p></div>
+    <div class="logo-grid">
+      <button class="logo-card" type="button" data-brand-card="current" aria-pressed="false">
+        <span class="logo-card-preview"><span class="brand-mark current-mark" aria-hidden="true"></span><span class="brand-copy"><small>LTIS</small><strong>AI Ops Console</strong></span></span>
+        <footer><strong>현행 기준안</strong><span>운영 도구 중심</span></footer>
+      </button>
+      <button class="logo-card" type="button" data-brand-card="flow" aria-pressed="true">
+        <span class="logo-card-preview"><span class="brand-mark"><svg class="mark-svg" viewBox="0 0 100 100" aria-hidden="true"><path class="flow-base" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7M31 87C43 65 55 39 74 14C87 40 91 63 97 85M22 67C49 68 68 55 87 37"/><path class="flow-active" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7"/><path class="flow-active" d="M31 87C43 65 55 39 74 14C87 40 91 63 97 85"/><path class="flow-head" d="M79 34L93 31L88 45Z"/></svg></span><span class="brand-copy"><small>LTIS AI WORKSPACE</small><strong class="meta-word">Meta<span>AI</span>DE</strong></span></span>
+        <footer><strong>Flow · 추천</strong><span>업무·데이터 정렬</span></footer>
+      </button>
+      <button class="logo-card" type="button" data-brand-card="circuit" aria-pressed="false">
+        <span class="logo-card-preview"><span class="brand-mark"><svg class="mark-svg" viewBox="0 0 100 100" aria-hidden="true"><path class="circuit-body" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31M33 67L22 57M71 67L82 57"/><path class="circuit-line" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31M33 67L22 57M71 67L82 57"/><circle class="circuit-node n1" cx="18" cy="87" r="4"/><circle class="circuit-node n2" cx="61" cy="31" r="4"/><circle class="circuit-node n3" cx="86" cy="87" r="4"/></svg></span><span class="brand-copy"><small>LTIS AI WORKSPACE</small><strong class="meta-word">Meta<span>AI</span>DE</strong></span></span>
+        <footer><strong>Circuit</strong><span>AI·엔지니어링 강조</span></footer>
+      </button>
+    </div>
+    <p class="corporate-note">Metanet 회사 마크는 변형하지 않는 원칙에 따라 본 초안에서는 텍스트 보증 표기만 사용했습니다.</p>
+  </section>
+</main>
+
+<script>
+  (() => {
+    const consolePreview = document.getElementById('console-preview');
+    const brandButtons = [...document.querySelectorAll('button[data-brand]')];
+    const brandCards = [...document.querySelectorAll('[data-brand-card]')];
+    const stateButtons = [...document.querySelectorAll('[data-state]')];
+    const speed = document.getElementById('motion-speed');
+    const processingToggle = document.getElementById('processing-toggle');
+
+    const setBrand = (brand) => {
+      consolePreview.dataset.brand = brand;
+      brandButtons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.brand === brand)));
+      brandCards.forEach((card) => card.setAttribute('aria-pressed', String(card.dataset.brandCard === brand)));
+    };
+
+    const setState = (state) => {
+      const processing = state === 'processing';
+      consolePreview.classList.toggle('is-processing', processing);
+      consolePreview.classList.toggle('is-chat', !processing);
+      stateButtons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.state === state)));
+    };
+
+    brandButtons.forEach((button) => button.addEventListener('click', () => setBrand(button.dataset.brand)));
+    brandCards.forEach((card) => card.addEventListener('click', () => {
+      setBrand(card.dataset.brandCard);
+      consolePreview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }));
+    stateButtons.forEach((button) => button.addEventListener('click', () => setState(button.dataset.state)));
+    processingToggle.addEventListener('click', () => setState(consolePreview.classList.contains('is-processing') ? 'chat' : 'processing'));
+    speed.addEventListener('change', () => document.documentElement.style.setProperty('--motion-duration', speed.value));
+  })();
+</script>
+</body>
+</html>

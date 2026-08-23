@@ -4,6 +4,9 @@ AI 브랜드 로고 후보와 반복형 로딩 애니메이션을 비교하는 �
 
 ## Preview
 
+- [운영 콘솔 브랜드 적용 시안](./console-brand-preview.html)
+- [브랜드 모션 실험실](./index.html)
+
 - Concept 1: Compass sweep
 - Concept 2: Generative knot
 - Concept 3: Circuit boot
