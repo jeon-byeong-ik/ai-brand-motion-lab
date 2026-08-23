@@ -172,19 +172,41 @@
   .current-mark {
     display: grid;
     place-items: center;
-    border-radius: 15px;
-    background: radial-gradient(circle, rgba(27, 234, 209, .23), rgba(11, 58, 70, .78) 54%, #07121c 75%);
-    box-shadow: inset 0 0 0 1px rgba(37, 231, 211, .24), 0 0 20px rgba(25, 211, 198, .16);
+    overflow: visible;
+    border-radius: 12px;
+    background: transparent;
+    isolation: isolate;
   }
-  .current-mark::before, .current-mark::after {
+  .current-mark::before,
+  .current-mark::after {
     content: "";
     position: absolute;
-    width: 18px;
-    height: 18px;
-    border: 1px solid var(--cyan);
-    transform: rotate(45deg);
+    border-radius: inherit;
   }
-  .current-mark::after { width: 7px; height: 7px; border-radius: 50%; box-shadow: 0 0 8px var(--cyan); }
+  .current-mark::before {
+    inset: 0;
+    z-index: 0;
+    background: conic-gradient(from 0deg, var(--cyan) 0deg, transparent 100deg, var(--blue) 200deg, transparent 300deg, var(--cyan) 360deg);
+    animation: current-spin 7s linear infinite;
+    filter: drop-shadow(0 0 7px rgba(36, 229, 209, .28));
+  }
+  .current-mark::after {
+    inset: 2px;
+    z-index: 1;
+    background: linear-gradient(145deg, #070c14, #0a111c 95%);
+    box-shadow: 0 0 15px rgba(36, 229, 209, .16);
+  }
+  .current-sparkle {
+    position: relative;
+    z-index: 2;
+    width: 43%;
+    height: 43%;
+    color: var(--cyan);
+    filter: drop-shadow(0 0 6px rgba(36, 229, 209, .58));
+    animation: current-pulse 1.8s ease-in-out infinite alternate;
+  }
+  @keyframes current-spin { to { transform: rotate(360deg); } }
+  @keyframes current-pulse { to { opacity: .58; transform: scale(.88); } }
 
   .mark-svg { width: 100%; height: 100%; overflow: visible; }
   .flow-base, .circuit-body {
@@ -234,6 +256,9 @@
   .console[data-brand="current"] .brand-current,
   .console[data-brand="flow"] .brand-flow,
   .console[data-brand="circuit"] .brand-circuit { display: flex; }
+  .current-ui { display: none; }
+  .console[data-brand="current"] .current-ui { display: inline-flex; }
+  .console[data-brand="current"] .proposed-ui { display: none !important; }
 
   .nav-scroll { flex: 1; padding: 14px 10px 18px; }
   .nav-label { margin: 0 9px 8px; color: #5e6f85; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; }
@@ -315,6 +340,7 @@
   .search kbd { padding: 2px 5px; border-radius: 5px; color: #586a80; background: #131d2a; font-size: 8px; }
   .connected { display: inline-flex; align-items: center; gap: 6px; color: #7f93aa; font-size: 9px; white-space: nowrap; }
   .connected::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 7px rgba(71, 223, 162, .7); }
+  .current-theme { width: 27px; height: 27px; align-items: center; justify-content: center; color: #7e8fa5; font-size: 16px; }
   .user { min-height: 35px; display: flex; align-items: center; gap: 8px; padding: 3px 5px 3px 10px; border: 1px solid var(--line); border-radius: 10px; background: #0c131e; }
   .user-copy { text-align: right; }
   .user-copy strong { display: block; font-size: 9px; font-weight: 600; }
@@ -339,9 +365,7 @@
   .user-message .bubble { color: #03221f; border-color: transparent; background: linear-gradient(135deg, #28d9c6, #1db8b2); }
   .assistant-avatar { width: 30px; height: 30px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 10px; color: var(--cyan); background: #101a28; }
   .assistant-avatar .brand-mark { width: 22px; height: 22px; }
-  .assistant-avatar .current-mark { border-radius: 8px; }
-  .assistant-avatar .current-mark::before { width: 10px; height: 10px; }
-  .assistant-avatar .current-mark::after { width: 4px; height: 4px; }
+  .assistant-avatar .current-mark { border-radius: 7px; }
   .bubble b { color: #f5f8fc; font-weight: 600; }
   .bubble code { padding: 2px 5px; border-radius: 4px; color: #bbd7ed; background: #172231; font-family: Consolas, monospace; }
 
@@ -358,9 +382,7 @@
     background: radial-gradient(circle, rgba(27, 115, 212, .19), rgba(7, 16, 27, .28) 60%, transparent 70%);
   }
   .processing-logo .brand-mark { width: 88px; height: 88px; }
-  .processing-logo .current-mark { border-radius: 28px; }
-  .processing-logo .current-mark::before { width: 36px; height: 36px; }
-  .processing-logo .current-mark::after { width: 12px; height: 12px; }
+  .processing-logo .current-mark { border-radius: 27px; }
   .processing-stage h2 { margin: 0; font-size: clamp(19px, 2.4vw, 25px); font-weight: 600; letter-spacing: -.035em; }
   .processing-stage h2 .brand-current,
   .processing-stage h2 .brand-flow,
@@ -395,6 +417,13 @@
   .tool { min-height: 25px; padding: 0 8px; border: 0; border-radius: 7px; color: #7690aa; background: transparent; font-size: 9px; }
   .tool.on { color: #c4f5f0; background: rgba(31, 156, 213, .1); }
   .model { margin-left: auto; color: #71839a; font-size: 8px; }
+  .current-composer { display: none; padding-top: 7px; }
+  .console[data-brand="current"] .current-composer { display: block; }
+  .current-options { display: flex; align-items: center; gap: 7px; padding: 0 9px 6px; color: #6f829a; font-size: 9px; }
+  .current-options select { min-height: 25px; padding: 0 22px 0 7px; border: 1px solid var(--line); border-radius: 7px; color: #d7e3f1; background: #111927; font-size: 9px; }
+  .current-tags { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 9px 7px; }
+  .current-tag { min-height: 21px; display: inline-flex; align-items: center; padding: 0 7px; border: 1px solid rgba(106, 143, 180, .17); border-radius: 999px; color: #6f88a5; font-size: 8px; }
+  .current-tag.active { color: var(--cyan); border-color: rgba(36, 229, 209, .42); }
 
   .logo-section { margin-top: 18px; }
   .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
@@ -467,6 +496,8 @@
 
   @media (prefers-reduced-motion: reduce) {
     .console { --motion-duration: 3.6s; }
+    .current-mark::before,
+    .current-sparkle { animation-duration: 3.6s; }
   }
 </style>
 </head>
@@ -496,7 +527,7 @@
 
   <section class="console is-chat" id="console-preview" data-brand="flow" aria-label="LTIS 운영 콘솔 브랜드 시안">
     <aside class="sidebar" aria-label="주 메뉴">
-      <div class="brand-slot brand-current"><span class="brand-mark current-mark" aria-hidden="true"></span><span class="brand-copy"><small>LTIS</small><strong>AI Ops Console</strong></span></div>
+      <div class="brand-slot brand-current"><span class="brand-mark current-mark" aria-hidden="true"><svg class="current-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4M22 5h-4M4 17v2M5 18H3"/></svg></span><span class="brand-copy"><small>LTIS</small><strong>AI Ops Console</strong></span></div>
       <div class="brand-slot brand-flow"><span class="brand-mark"><svg class="mark-svg" viewBox="0 0 100 100" role="img" aria-label="MetaAIDE Flow 로고"><defs><linearGradient id="flow-gradient" x1="12" y1="91" x2="88" y2="9"><stop stop-color="#32a7ff"/><stop offset="1" stop-color="#24e5d1"/></linearGradient></defs><path class="flow-base" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7M31 87C43 65 55 39 74 14C87 40 91 63 97 85M22 67C49 68 68 55 87 37"/><path class="flow-active" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7"/><path class="flow-active" d="M31 87C43 65 55 39 74 14C87 40 91 63 97 85"/><path class="flow-active" d="M22 67C49 68 68 55 87 37"/><path class="flow-head" d="M79 34L93 31L88 45Z"/></svg></span><span class="brand-copy"><small>LTIS AI WORKSPACE</small><strong class="meta-word">Meta<span>AI</span>DE</strong></span></div>
       <div class="brand-slot brand-circuit"><span class="brand-mark"><svg class="mark-svg" viewBox="0 0 100 100" role="img" aria-label="MetaAIDE Circuit 로고"><defs><linearGradient id="circuit-gradient" x1="15" y1="90" x2="82" y2="9"><stop stop-color="#32a7ff"/><stop offset="1" stop-color="#24e5d1"/></linearGradient></defs><path class="circuit-body" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31M33 67L22 57M71 67L82 57"/><path class="circuit-line" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31M33 67L22 57M71 67L82 57"/><circle class="circuit-node n1" cx="18" cy="87" r="4"/><circle class="circuit-node n2" cx="61" cy="31" r="4"/><circle class="circuit-node n3" cx="86" cy="87" r="4"/></svg></span><span class="brand-copy"><small>LTIS AI WORKSPACE</small><strong class="meta-word">Meta<span>AI</span>DE</strong></span></div>
 
@@ -516,7 +547,7 @@
         <button class="nav-item" type="button"><i class="nav-icon">✦</i><span>코드 제안 (SR 기반)</span></button>
         <button class="nav-item" type="button"><i class="nav-icon">◇</i><span>설계 산출물 생성</span></button>
       </div>
-      <div class="nav-footer"><span>Draft 0.1</span><b class="endorsement">by Metanet</b></div>
+      <div class="nav-footer"><span class="current-ui">v0.4 · Studio Console</span><span class="proposed-ui">Draft 0.1</span><b class="endorsement proposed-ui">by Metanet</b></div>
     </aside>
 
     <aside class="history" aria-label="대화 목록">
@@ -531,7 +562,7 @@
     <section class="workspace">
       <header class="topbar">
         <div class="top-left"><button class="menu-button" type="button" aria-label="메뉴">☰</button><div class="search">⌕ <span>Search</span><kbd>⌘K</kbd></div></div>
-        <div class="top-right"><span class="connected">LTIS 운영 연결됨</span><div class="user"><span class="user-copy"><strong>System Admin</strong><small>ADMIN</small></span><span class="avatar">SA</span></div></div>
+        <div class="top-right"><span class="current-theme current-ui" aria-label="테마">☼</span><span class="connected proposed-ui">LTIS 운영 연결됨</span><div class="user"><span class="user-copy"><strong>System Admin</strong><small>ADMIN</small></span><span class="avatar">SA</span></div></div>
       </header>
 
       <div class="chat-stage">
@@ -539,7 +570,7 @@
           <article class="message user-message"><div class="bubble">서비스 요청 내용을 분석해서 사용자 답변 초안을 만들어 주세요.</div></article>
           <article class="message assistant-message">
             <div class="assistant-avatar">
-              <span class="brand-mark current-mark brand-current" aria-hidden="true"></span>
+              <span class="brand-mark current-mark brand-current" aria-hidden="true"><svg class="current-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></span>
               <span class="brand-mark brand-flow"><svg class="mark-svg" viewBox="0 0 100 100" aria-hidden="true"><path class="flow-base" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7M31 87C43 65 55 39 74 14C87 40 91 63 97 85M22 67C49 68 68 55 87 37"/><path class="flow-active" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7"/></svg></span>
               <span class="brand-mark brand-circuit"><svg class="mark-svg" viewBox="0 0 100 100" aria-hidden="true"><path class="circuit-body" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31"/><path class="circuit-line" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31"/></svg></span>
             </div>
@@ -550,7 +581,7 @@
 
         <div class="processing-stage">
           <div class="processing-logo">
-            <span class="brand-mark current-mark brand-current" aria-hidden="true"></span>
+            <span class="brand-mark current-mark brand-current" aria-hidden="true"><svg class="current-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4M22 5h-4M4 17v2M5 18H3"/></svg></span>
             <span class="brand-mark brand-flow"><svg class="mark-svg" viewBox="0 0 100 100" aria-hidden="true"><path class="flow-base" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7M31 87C43 65 55 39 74 14C87 40 91 63 97 85M22 67C49 68 68 55 87 37"/><path class="flow-active" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7"/><path class="flow-active" d="M31 87C43 65 55 39 74 14C87 40 91 63 97 85"/><path class="flow-active" d="M22 67C49 68 68 55 87 37"/><path class="flow-head" d="M79 34L93 31L88 45Z"/></svg></span>
             <span class="brand-mark brand-circuit"><svg class="mark-svg" viewBox="0 0 100 100" aria-hidden="true"><path class="circuit-body" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31M33 67L22 57M71 67L82 57"/><path class="circuit-line" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31M33 67L22 57M71 67L82 57"/><circle class="circuit-node n1" cx="18" cy="87" r="4"/><circle class="circuit-node n2" cx="61" cy="31" r="4"/><circle class="circuit-node n3" cx="86" cy="87" r="4"/></svg></span>
           </div>
@@ -559,9 +590,14 @@
           <div class="processing-steps"><span class="processing-step">질문 이해</span><span class="processing-step active">업무 지식 검색</span><span class="processing-step">답변 검증</span></div>
         </div>
 
-        <div class="composer">
-          <div class="compose-main"><button class="attach" type="button" aria-label="파일 첨부">＋</button><input aria-label="메시지" placeholder="LTIS 업무나 코드에 대해 질문하세요"><button class="send" id="processing-toggle" type="button" aria-label="AI 처리 상태 전환">↑</button></div>
+        <div class="composer proposed-ui">
+          <div class="compose-main"><button class="attach" type="button" aria-label="파일 첨부">＋</button><input aria-label="메시지" placeholder="LTIS 업무나 코드에 대해 질문하세요"><button class="send" data-processing-toggle type="button" aria-label="AI 처리 상태 전환">↑</button></div>
           <div class="compose-tools"><button class="tool on" type="button">지식 연결</button><button class="tool on" type="button">도구 사용</button><button class="tool" type="button">service_requests</button><span class="model">META AI · Balanced</span></div>
+        </div>
+        <div class="composer current-composer current-ui">
+          <div class="current-options"><span>Model</span><select aria-label="현재 모델"><option>basic</option><option>light</option></select><span>☑ RAG</span></div>
+          <div class="current-tags"><span class="current-tag">coding_rules</span><span class="current-tag">egovfw_rules</span><span class="current-tag active">service_requests</span><span class="current-tag">playwright_rules</span></div>
+          <div class="compose-main"><button class="attach" type="button" aria-label="파일 첨부">＋</button><input aria-label="현행 메시지" placeholder="메시지를 입력하세요…"><button class="send" data-processing-toggle type="button" aria-label="AI 처리 상태 전환">↑</button></div>
         </div>
       </div>
     </section>
@@ -571,7 +607,7 @@
     <div class="section-head"><h2 id="logo-title">로고 적용 방향</h2><p>카드를 누르면 운영 화면에 즉시 반영됩니다.</p></div>
     <div class="logo-grid">
       <button class="logo-card" type="button" data-brand-card="current" aria-pressed="false">
-        <span class="logo-card-preview"><span class="brand-mark current-mark" aria-hidden="true"></span><span class="brand-copy"><small>LTIS</small><strong>AI Ops Console</strong></span></span>
+        <span class="logo-card-preview"><span class="brand-mark current-mark" aria-hidden="true"><svg class="current-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4M22 5h-4M4 17v2M5 18H3"/></svg></span><span class="brand-copy"><small>LTIS</small><strong>AI Ops Console</strong></span></span>
         <footer><strong>현행 기준안</strong><span>운영 도구 중심</span></footer>
       </button>
       <button class="logo-card" type="button" data-brand-card="flow" aria-pressed="true">
@@ -594,7 +630,7 @@
     const brandCards = [...document.querySelectorAll('[data-brand-card]')];
     const stateButtons = [...document.querySelectorAll('[data-state]')];
     const speed = document.getElementById('motion-speed');
-    const processingToggle = document.getElementById('processing-toggle');
+    const processingToggles = [...document.querySelectorAll('[data-processing-toggle]')];
 
     const setBrand = (brand) => {
       consolePreview.dataset.brand = brand;
@@ -615,7 +651,7 @@
       consolePreview.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }));
     stateButtons.forEach((button) => button.addEventListener('click', () => setState(button.dataset.state)));
-    processingToggle.addEventListener('click', () => setState(consolePreview.classList.contains('is-processing') ? 'chat' : 'processing'));
+    processingToggles.forEach((button) => button.addEventListener('click', () => setState(consolePreview.classList.contains('is-processing') ? 'chat' : 'processing')));
     speed.addEventListener('change', () => document.documentElement.style.setProperty('--motion-duration', speed.value));
   })();
 </script>
