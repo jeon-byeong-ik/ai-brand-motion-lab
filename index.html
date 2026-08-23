@@ -1350,10 +1350,17 @@ html&gt;body{padding:0}&lt;/style&gt;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    #metaide-loading-loops *,
-    #metaide-loading-loops *::before,
-    #metaide-loading-loops *::after { animation: none !important; }
-    #metaide-loading-loops .ml-active { stroke-dasharray: none; }
+    /* Decorative motion can stop, but the loader must keep communicating progress. */
+    #metaide-loading-loops .ml-ambient *,
+    #metaide-loading-loops .ml-ambient *::before,
+    #metaide-loading-loops .ml-ambient *::after {
+      animation: none !important;
+    }
+
+    /* Keep the functional loading signal visible at a calmer pace. */
+    #metaide-loading-loops {
+      --ml-duration: 3.6s;
+    }
   }
 &lt;/style&gt;
 
