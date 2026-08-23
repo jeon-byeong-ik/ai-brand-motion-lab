@@ -25,7 +25,7 @@
     --yellow: #ffc83d;
     --green: #47dfa2;
     --motion-duration: 1.5s;
-    font-family: Pretendard, "Noto Sans KR", "Segoe UI", Arial, sans-serif;
+    font-family: Geist, "Noto Sans KR", "Segoe UI", Arial, sans-serif;
   }
 
   * { box-sizing: border-box; }
@@ -143,7 +143,8 @@
     min-height: 700px;
     overflow: hidden;
     display: grid;
-    grid-template-columns: 214px 218px minmax(0, 1fr);
+    grid-template-columns: 256px 224px minmax(0, 1fr);
+    grid-template-rows: 56px minmax(0, 1fr);
     border: 1px solid var(--line-strong);
     border-radius: 15px;
     background: #070c14;
@@ -158,7 +159,9 @@
     border-right: 1px solid var(--line);
     background: #0a0f19;
   }
-  .sidebar { display: flex; flex-direction: column; }
+  .sidebar { grid-column: 1; grid-row: 1 / 3; display: flex; flex-direction: column; }
+  .history { grid-column: 2; grid-row: 2; }
+  .workspace { grid-column: 3; grid-row: 2; }
   .brand-slot {
     min-height: 74px;
     display: flex;
@@ -169,6 +172,8 @@
   }
 
   .brand-mark { position: relative; width: 43px; height: 43px; flex: 0 0 auto; }
+  .brand-slot.brand-current .brand-mark { width: 36px; height: 36px; }
+  .brand-slot.brand-current .current-mark::after { inset: 8px; }
   .current-mark {
     display: grid;
     place-items: center;
@@ -186,12 +191,12 @@
   .current-mark::before {
     inset: 0;
     z-index: 0;
-    background: conic-gradient(from 0deg, var(--cyan) 0deg, transparent 100deg, var(--blue) 200deg, transparent 300deg, var(--cyan) 360deg);
-    animation: current-spin 7s linear infinite;
-    filter: drop-shadow(0 0 7px rgba(36, 229, 209, .28));
+    background: conic-gradient(from 0deg, hsl(173 80% 45%) 0deg, transparent 100deg, hsl(199 89% 58%) 200deg, transparent 300deg, hsl(173 80% 45%) 360deg);
+    animation: current-spin 6s linear infinite, current-glow 2.2s ease-in-out infinite;
+    filter: drop-shadow(0 0 7px rgba(20, 207, 185, .28));
   }
   .current-mark::after {
-    inset: 2px;
+    inset: 18%;
     z-index: 1;
     background: linear-gradient(145deg, #070c14, #0a111c 95%);
     box-shadow: 0 0 15px rgba(36, 229, 209, .16);
@@ -203,10 +208,9 @@
     height: 43%;
     color: var(--cyan);
     filter: drop-shadow(0 0 6px rgba(36, 229, 209, .58));
-    animation: current-pulse 1.8s ease-in-out infinite alternate;
   }
   @keyframes current-spin { to { transform: rotate(360deg); } }
-  @keyframes current-pulse { to { opacity: .58; transform: scale(.88); } }
+  @keyframes current-glow { 50% { opacity: .75; filter: drop-shadow(0 0 4px rgba(20, 207, 185, .2)); } }
 
   .mark-svg { width: 100%; height: 100%; overflow: visible; }
   .flow-base, .circuit-body {
@@ -295,7 +299,7 @@
   .console:not([data-brand="current"]) .endorsement { color: #83a9d4; }
 
   .history { background: #080d15; }
-  .history-head { min-height: 74px; display: flex; align-items: center; justify-content: space-between; padding: 0 13px; border-bottom: 1px solid var(--line); color: #8fa6c0; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+  .history-head { min-height: 45px; display: flex; align-items: center; justify-content: space-between; padding: 0 13px; border-bottom: 1px solid var(--line); color: #8fa6c0; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
   .history-actions { display: flex; gap: 5px; }
   .icon-button {
     width: 27px;
@@ -325,7 +329,9 @@
 
   .workspace { min-width: 0; position: relative; display: flex; flex-direction: column; overflow: hidden; background: #070b12; }
   .topbar {
-    min-height: 74px;
+    grid-column: 2 / 4;
+    grid-row: 1;
+    min-height: 56px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -366,12 +372,42 @@
   .assistant-avatar { width: 30px; height: 30px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 10px; color: var(--cyan); background: #101a28; }
   .assistant-avatar .brand-mark { width: 22px; height: 22px; }
   .assistant-avatar .current-mark { border-radius: 7px; }
+  .current-bot, .user-avatar { display: none; }
+  .console[data-brand="current"] .current-bot,
+  .console[data-brand="current"] .user-avatar { display: grid; }
+  .console[data-brand="current"] .assistant-avatar {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    color: #7f91a8;
+    background: #111927;
+  }
+  .console[data-brand="current"] .assistant-avatar .brand-mark { display: none; }
+  .current-bot, .user-avatar svg { width: 14px; height: 14px; }
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 50%;
+    color: #03221f;
+    background: hsl(173 80% 45%);
+  }
   .bubble b { color: #f5f8fc; font-weight: 600; }
   .bubble code { padding: 2px 5px; border-radius: 4px; color: #bbd7ed; background: #172231; font-family: Consolas, monospace; }
 
   .processing-stage { display: none; width: min(620px, calc(100% - 36px)); margin: 0 auto; padding: 78px 0 200px; text-align: center; }
   .console.is-processing .messages { display: none; }
   .console.is-processing .processing-stage { display: block; }
+  .current-thinking { display: none; }
+  .console.is-processing[data-brand="current"] .messages { display: block; }
+  .console.is-processing[data-brand="current"] .current-thinking { display: flex; }
+  .console.is-processing[data-brand="current"] .processing-stage { display: none; }
+  .thinking-inline { display: inline-flex; align-items: center; gap: 6px; color: #7f91a8; }
+  .thinking-inline .current-mark { width: 16px; height: 16px; border-radius: 4px; }
+  .thinking-inline .current-mark::after { inset: 4px; }
+  .thinking-inline .current-sparkle { width: 50%; height: 50%; }
   .processing-logo {
     width: 116px;
     height: 116px;
@@ -424,6 +460,29 @@
   .current-tags { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 9px 7px; }
   .current-tag { min-height: 21px; display: inline-flex; align-items: center; padding: 0 7px; border: 1px solid rgba(106, 143, 180, .17); border-radius: 999px; color: #6f88a5; font-size: 8px; }
   .current-tag.active { color: var(--cyan); border-color: rgba(36, 229, 209, .42); }
+  .current-tool-call { display: inline-flex; align-items: center; gap: 5px; margin-left: 2px; color: #71839a; }
+  .current-tool-call input { accent-color: hsl(173 80% 45%); }
+  .console[data-brand="current"] .current-composer {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    transform: none;
+    width: 100%;
+    padding: 12px 24px 14px;
+    border-width: 1px 0 0;
+    border-radius: 0;
+    background: rgba(7, 11, 18, .98);
+    box-shadow: none;
+  }
+  .console[data-brand="current"] .current-options,
+  .console[data-brand="current"] .current-tags,
+  .console[data-brand="current"] .current-composer .compose-main {
+    width: min(760px, 100%);
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .console[data-brand="current"] .chat-stage { display: flex; flex-direction: column; }
+  .console[data-brand="current"] .messages { flex: 1; width: min(760px, calc(100% - 48px)); padding: 28px 0 22px; overflow: hidden; }
 
   .logo-section { margin-top: 18px; }
   .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
@@ -447,6 +506,7 @@
   .logo-card[aria-pressed="true"] { border-color: rgba(36, 229, 209, .5); box-shadow: inset 0 0 0 1px rgba(36, 229, 209, .12), 0 0 28px rgba(23, 174, 175, .06); }
   .logo-card-preview { min-height: 68px; display: flex; align-items: center; gap: 12px; }
   .logo-card-preview .brand-mark { width: 54px; height: 54px; }
+  .logo-card-preview .current-mark::after { inset: 8px; }
   .logo-card-preview .brand-copy strong { font-size: 16px; }
   .logo-card-preview .brand-copy .meta-word { font-size: 22px; }
   .logo-card footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 10px; border-top: 1px solid var(--line); }
@@ -457,7 +517,7 @@
   @media (max-width: 1120px) {
     .review-bar { align-items: flex-start; flex-wrap: wrap; }
     .review-controls { width: 100%; order: 3; margin-left: 0; }
-    .console { grid-template-columns: 178px 190px minmax(0, 1fr); }
+    .console { grid-template-columns: 190px 190px minmax(0, 1fr); }
     .nav-item { font-size: 11px; }
   }
 
@@ -483,7 +543,8 @@
     .review-heading { align-items: flex-start; flex-direction: column; }
     .console { min-height: 720px; grid-template-columns: minmax(0, 1fr); }
     .sidebar, .history { display: none; }
-    .topbar { min-height: 62px; padding: 0 11px; }
+    .topbar { grid-column: 1; grid-row: 1; min-height: 62px; padding: 0 11px; }
+    .workspace { grid-column: 1; grid-row: 2; }
     .search { width: 32px; justify-content: center; padding: 0; }
     .search span, .search kbd, .user-copy { display: none; }
     .user { padding: 3px; border: 0; background: transparent; }
@@ -496,8 +557,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .console { --motion-duration: 3.6s; }
-    .current-mark::before,
-    .current-sparkle { animation-duration: 3.6s; }
+    .current-mark::before { animation: none; }
   }
 </style>
 </head>
@@ -507,8 +567,8 @@
   <nav class="review-links" aria-label="시안 페이지"><a href="./console-brand-preview.html" aria-current="page">운영 화면 적용</a><a href="./index.html">모션 실험실</a></nav>
   <div class="review-controls">
     <div class="segment brand-segment" role="group" aria-label="브랜드 시안">
-      <button type="button" data-brand="current" aria-pressed="false">현행</button>
-      <button type="button" data-brand="flow" aria-pressed="true">MetaAIDE Flow</button>
+      <button type="button" data-brand="current" aria-pressed="true">현행</button>
+      <button type="button" data-brand="flow" aria-pressed="false">MetaAIDE Flow</button>
       <button type="button" data-brand="circuit" aria-pressed="false">MetaAIDE Circuit</button>
     </div>
     <div class="segment state-segment" role="group" aria-label="화면 상태">
@@ -525,7 +585,7 @@
     <span class="review-badge">STATIC DEMO · NO PRODUCTION DATA</span>
   </div>
 
-  <section class="console is-chat" id="console-preview" data-brand="flow" aria-label="LTIS 운영 콘솔 브랜드 시안">
+  <section class="console is-chat" id="console-preview" data-brand="current" aria-label="LTIS 운영 콘솔 브랜드 시안">
     <aside class="sidebar" aria-label="주 메뉴">
       <div class="brand-slot brand-current"><span class="brand-mark current-mark" aria-hidden="true"><svg class="current-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4M22 5h-4M4 17v2M5 18H3"/></svg></span><span class="brand-copy"><small>LTIS</small><strong>AI Ops Console</strong></span></div>
       <div class="brand-slot brand-flow"><span class="brand-mark"><svg class="mark-svg" viewBox="0 0 100 100" role="img" aria-label="MetaAIDE Flow 로고"><defs><linearGradient id="flow-gradient" x1="12" y1="91" x2="88" y2="9"><stop stop-color="#32a7ff"/><stop offset="1" stop-color="#24e5d1"/></linearGradient></defs><path class="flow-base" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7M31 87C43 65 55 39 74 14C87 40 91 63 97 85M22 67C49 68 68 55 87 37"/><path class="flow-active" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7"/><path class="flow-active" d="M31 87C43 65 55 39 74 14C87 40 91 63 97 85"/><path class="flow-active" d="M22 67C49 68 68 55 87 37"/><path class="flow-head" d="M79 34L93 31L88 45Z"/></svg></span><span class="brand-copy"><small>LTIS AI WORKSPACE</small><strong class="meta-word">Meta<span>AI</span>DE</strong></span></div>
@@ -539,16 +599,22 @@
         <button class="nav-item" type="button"><i class="nav-icon">▣</i><span>Knowledge</span></button>
         <button class="nav-item" type="button"><i class="nav-icon">↶</i><span>프로젝트 히스토리</span></button>
         <button class="nav-item" type="button"><i class="nav-icon">◇</i><span>서비스요청 품질</span></button>
+        <button class="nav-item" type="button"><i class="nav-icon">⌘</i><span>Continue 설정</span></button>
         <div class="nav-label">AI 도구</div>
         <button class="nav-item" type="button"><i class="nav-icon">△</i><span>서비스요청 답변 추천</span></button>
         <button class="nav-item" type="button"><i class="nav-icon">≡</i><span>ADDT 초안 생성</span></button>
         <button class="nav-item" type="button"><i class="nav-icon">◉</i><span>SQL 쿼리 초안 생성</span></button>
-        <button class="nav-item" type="button"><i class="nav-icon">✓</i><span>QA 테스트케이스</span></button>
+        <button class="nav-item" type="button"><i class="nav-icon">✓</i><span>QA 테스트케이스 초안 생성</span></button>
         <button class="nav-item" type="button"><i class="nav-icon">✦</i><span>코드 제안 (SR 기반)</span></button>
         <button class="nav-item" type="button"><i class="nav-icon">◇</i><span>설계 산출물 생성</span></button>
       </div>
       <div class="nav-footer"><span class="current-ui">v0.4 · Studio Console</span><span class="proposed-ui">Draft 0.1</span><b class="endorsement proposed-ui">by Metanet</b></div>
     </aside>
+
+    <header class="topbar">
+      <div class="top-left"><button class="menu-button" type="button" aria-label="메뉴">☰</button><div class="search">⌕ <span>Search</span><kbd>⌘K</kbd></div></div>
+      <div class="top-right"><span class="current-theme current-ui" aria-label="테마">☼</span><span class="connected proposed-ui">LTIS 운영 연결됨</span><div class="user"><span class="user-copy"><strong>System Admin</strong><small>ADMIN</small></span><span class="avatar">SA</span></div></div>
+    </header>
 
     <aside class="history" aria-label="대화 목록">
       <div class="history-head"><span>Conversations</span><div class="history-actions"><button class="icon-button" type="button" aria-label="전체 삭제">⌫</button><button class="icon-button" type="button" aria-label="새 대화">＋</button></div></div>
@@ -560,23 +626,22 @@
     </aside>
 
     <section class="workspace">
-      <header class="topbar">
-        <div class="top-left"><button class="menu-button" type="button" aria-label="메뉴">☰</button><div class="search">⌕ <span>Search</span><kbd>⌘K</kbd></div></div>
-        <div class="top-right"><span class="current-theme current-ui" aria-label="테마">☼</span><span class="connected proposed-ui">LTIS 운영 연결됨</span><div class="user"><span class="user-copy"><strong>System Admin</strong><small>ADMIN</small></span><span class="avatar">SA</span></div></div>
-      </header>
-
       <div class="chat-stage">
         <div class="messages">
-          <article class="message user-message"><div class="bubble">서비스 요청 내용을 분석해서 사용자 답변 초안을 만들어 주세요.</div></article>
+          <article class="message user-message"><div class="bubble">서비스 요청 내용을 분석해서 사용자 답변 초안을 만들어 주세요.</div><span class="user-avatar current-ui" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg></span></article>
           <article class="message assistant-message">
             <div class="assistant-avatar">
-              <span class="brand-mark current-mark brand-current" aria-hidden="true"><svg class="current-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></span>
+              <svg class="current-bot brand-current" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="10" x="3" y="11" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4M8 16h.01M16 16h.01"/></svg>
               <span class="brand-mark brand-flow"><svg class="mark-svg" viewBox="0 0 100 100" aria-hidden="true"><path class="flow-base" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7M31 87C43 65 55 39 74 14C87 40 91 63 97 85M22 67C49 68 68 55 87 37"/><path class="flow-active" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7"/></svg></span>
               <span class="brand-mark brand-circuit"><svg class="mark-svg" viewBox="0 0 100 100" aria-hidden="true"><path class="circuit-body" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31"/><path class="circuit-line" d="M18 87L43 14H61L86 87M30 66H74M45 49V30M60 50V31"/></svg></span>
             </div>
             <div class="bubble">관련 업무 규칙과 최근 변경 이력을 확인했습니다.<br><br><b>1. 요청 분류</b><br>• 현상과 영향 범위를 기준으로 <code>처리 유형</code>을 구분합니다.<br><br><b>2. 확인 항목</b><br>• 재현 조건, 데이터 상태, 선행 작업 여부를 순서대로 점검합니다.</div>
           </article>
-          <article class="message user-message"><div class="bubble">변경 대상 프로그램과 테스트 항목도 함께 정리해 주세요.</div></article>
+          <article class="message user-message"><div class="bubble">변경 대상 프로그램과 테스트 항목도 함께 정리해 주세요.</div><span class="user-avatar current-ui" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg></span></article>
+          <article class="message assistant-message current-thinking">
+            <div class="assistant-avatar"><svg class="current-bot brand-current" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="10" x="3" y="11" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4M8 16h.01M16 16h.01"/></svg></div>
+            <div class="bubble"><span class="thinking-inline"><span class="brand-mark current-mark" aria-hidden="true"><svg class="current-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg></span><span>생각 중…</span></span></div>
+          </article>
         </div>
 
         <div class="processing-stage">
@@ -595,9 +660,9 @@
           <div class="compose-tools"><button class="tool on" type="button">지식 연결</button><button class="tool on" type="button">도구 사용</button><button class="tool" type="button">service_requests</button><span class="model">META AI · Balanced</span></div>
         </div>
         <div class="composer current-composer current-ui">
-          <div class="current-options"><span>Model</span><select aria-label="현재 모델"><option>basic</option><option>light</option></select><span>☑ RAG</span></div>
+          <div class="current-options"><span>Model</span><select aria-label="현재 모델"><option>basic</option><option>light</option></select><span>☑ RAG</span><label class="current-tool-call"><input type="checkbox"> 도구 호출</label></div>
           <div class="current-tags"><span class="current-tag">coding_rules</span><span class="current-tag">egovfw_rules</span><span class="current-tag active">service_requests</span><span class="current-tag">playwright_rules</span></div>
-          <div class="compose-main"><button class="attach" type="button" aria-label="파일 첨부">＋</button><input aria-label="현행 메시지" placeholder="메시지를 입력하세요…"><button class="send" data-processing-toggle type="button" aria-label="AI 처리 상태 전환">↑</button></div>
+          <div class="compose-main"><button class="attach" type="button" aria-label="파일 첨부">＋</button><input aria-label="현행 메시지" placeholder="메시지를 입력하세요… (긴 텍스트·파일은 붙여넣으면 자동 첨부)"><button class="send" data-processing-toggle type="button" aria-label="AI 처리 상태 전환">↑</button></div>
         </div>
       </div>
     </section>
@@ -606,11 +671,11 @@
   <section class="logo-section" aria-labelledby="logo-title">
     <div class="section-head"><h2 id="logo-title">로고 적용 방향</h2><p>카드를 누르면 운영 화면에 즉시 반영됩니다.</p></div>
     <div class="logo-grid">
-      <button class="logo-card" type="button" data-brand-card="current" aria-pressed="false">
+      <button class="logo-card" type="button" data-brand-card="current" aria-pressed="true">
         <span class="logo-card-preview"><span class="brand-mark current-mark" aria-hidden="true"><svg class="current-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4M22 5h-4M4 17v2M5 18H3"/></svg></span><span class="brand-copy"><small>LTIS</small><strong>AI Ops Console</strong></span></span>
         <footer><strong>현행 기준안</strong><span>운영 도구 중심</span></footer>
       </button>
-      <button class="logo-card" type="button" data-brand-card="flow" aria-pressed="true">
+      <button class="logo-card" type="button" data-brand-card="flow" aria-pressed="false">
         <span class="logo-card-preview"><span class="brand-mark"><svg class="mark-svg" viewBox="0 0 100 100" aria-hidden="true"><path class="flow-base" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7M31 87C43 65 55 39 74 14C87 40 91 63 97 85M22 67C49 68 68 55 87 37"/><path class="flow-active" d="M15 85C38 73 45 52 55 31C62 18 67 12 74 7"/><path class="flow-active" d="M31 87C43 65 55 39 74 14C87 40 91 63 97 85"/><path class="flow-head" d="M79 34L93 31L88 45Z"/></svg></span><span class="brand-copy"><small>LTIS AI WORKSPACE</small><strong class="meta-word">Meta<span>AI</span>DE</strong></span></span>
         <footer><strong>Flow · 추천</strong><span>업무·데이터 정렬</span></footer>
       </button>
