@@ -1216,8 +1216,9 @@ html&gt;body{padding:0}&lt;/style&gt;
   }
   #metaide-loading-loops .ml-c2-base { stroke-width: 7; }
   #metaide-loading-loops .ml-c2-tracer {
+    stroke: url(#ml-c2-gradient);
     stroke-width: 8;
-    stroke-dasharray: .11 .89;
+    stroke-dasharray: 34 270;
     animation: ml-c2-trace var(--ml-duration) linear infinite;
   }
   #metaide-loading-loops .ml-c2-tracer.ml-delay-one { animation-delay: calc(var(--ml-duration) * -.33); }
@@ -1254,8 +1255,9 @@ html&gt;body{padding:0}&lt;/style&gt;
   /* Concept 4: three streams align and move upward */
   #metaide-loading-loops .ml-c4-base { stroke-width: 9; }
   #metaide-loading-loops .ml-c4-stream {
+    stroke: url(#ml-c4-gradient);
     stroke-width: 10;
-    stroke-dasharray: .16 .84;
+    stroke-dasharray: 48 320;
     animation: ml-c4-stream var(--ml-duration) cubic-bezier(.45, 0, .25, 1) infinite;
   }
   #metaide-loading-loops .ml-c4-stream.ml-delay-one { animation-delay: calc(var(--ml-duration) * -.2); }
@@ -1288,8 +1290,8 @@ html&gt;body{padding:0}&lt;/style&gt;
     50% { transform: scale(1.08); opacity: 1; }
   }
   @keyframes ml-c2-trace {
-    0% { stroke-dashoffset: 1; }
-    100% { stroke-dashoffset: -1; }
+    0% { stroke-dashoffset: 304; }
+    100% { stroke-dashoffset: -304; }
   }
   @keyframes ml-c2-breathe {
     0%, 100% { transform: scale(.97); }
@@ -1309,13 +1311,13 @@ html&gt;body{padding:0}&lt;/style&gt;
     18%, 38% { transform: scale(1.18); opacity: 1; }
   }
   @keyframes ml-c4-stream {
-    0% { stroke-dashoffset: 1; opacity: .25; }
+    0% { stroke-dashoffset: 368; opacity: .25; }
     18%, 72% { opacity: 1; }
-    100% { stroke-dashoffset: -1; opacity: .25; }
+    100% { stroke-dashoffset: -368; opacity: .25; }
   }
   @keyframes ml-c4-head {
-    0%, 55%, 100% { transform: translate(-4px, 4px) scale(.9); opacity: .45; }
-    70% { transform: translate(4px, -4px) scale(1.08); opacity: 1; }
+    0%, 48%, 100% { transform: translate(-7px, 7px) scale(.86); opacity: .38; }
+    68% { transform: translate(7px, -7px) scale(1.16); opacity: 1; filter: drop-shadow(0 0 10px var(--ml-glow)); }
   }
   @keyframes ml-radar {
     from { transform: translate(-50%, -50%) rotate(0deg); }
@@ -1435,6 +1437,12 @@ html&gt;body{padding:0}&lt;/style&gt;
           &lt;svg class=&quot;ml-loader&quot; viewBox=&quot;0 0 220 220&quot; role=&quot;img&quot; aria-labelledby=&quot;ml-c2-title ml-c2-desc&quot;&gt;
             &lt;title id=&quot;ml-c2-title&quot;&gt;Concept 2 반복 로더&lt;/title&gt;
             &lt;desc id=&quot;ml-c2-desc&quot;&gt;얽힌 리본 경로를 따라 세 개의 빛이 계속 순환합니다.&lt;/desc&gt;
+            &lt;defs&gt;
+              &lt;linearGradient id=&quot;ml-c2-gradient&quot; x1=&quot;38&quot; y1=&quot;190&quot; x2=&quot;194&quot; y2=&quot;34&quot; gradientUnits=&quot;userSpaceOnUse&quot;&gt;
+                &lt;stop stop-color=&quot;var(--ml-blue)&quot;/&gt;
+                &lt;stop offset=&quot;1&quot; stop-color=&quot;var(--ml-cyan)&quot;/&gt;
+              &lt;/linearGradient&gt;
+            &lt;/defs&gt;
             &lt;g class=&quot;ml-c2-group&quot;&gt;
               &lt;path class=&quot;ml-base ml-c2-base&quot; pathLength=&quot;1&quot; d=&quot;M38 181C70 142 75 73 101 40C119 17 146 35 163 70C181 107 193 151 207 181&quot;/&gt;
               &lt;path class=&quot;ml-base ml-c2-base&quot; pathLength=&quot;1&quot; d=&quot;M49 187C94 168 124 132 125 90C126 61 108 42 91 54C67 70 85 107 114 132C142 158 177 176 203 187&quot;/&gt;
@@ -1478,6 +1486,12 @@ html&gt;body{padding:0}&lt;/style&gt;
           &lt;svg class=&quot;ml-loader&quot; viewBox=&quot;0 0 220 220&quot; role=&quot;img&quot; aria-labelledby=&quot;ml-c4-title ml-c4-desc&quot;&gt;
             &lt;title id=&quot;ml-c4-title&quot;&gt;Concept 4 반복 로더&lt;/title&gt;
             &lt;desc id=&quot;ml-c4-desc&quot;&gt;세 개의 데이터 흐름이 위쪽 화살표 방향으로 반복 이동합니다.&lt;/desc&gt;
+            &lt;defs&gt;
+              &lt;linearGradient id=&quot;ml-c4-gradient&quot; x1=&quot;40&quot; y1=&quot;188&quot; x2=&quot;204&quot; y2=&quot;22&quot; gradientUnits=&quot;userSpaceOnUse&quot;&gt;
+                &lt;stop stop-color=&quot;var(--ml-blue)&quot;/&gt;
+                &lt;stop offset=&quot;1&quot; stop-color=&quot;var(--ml-cyan)&quot;/&gt;
+              &lt;/linearGradient&gt;
+            &lt;/defs&gt;
             &lt;path class=&quot;ml-base ml-c4-base&quot; d=&quot;M40 183C82 161 98 123 116 85C128 59 140 35 156 17&quot;/&gt;
             &lt;path class=&quot;ml-base ml-c4-base&quot; d=&quot;M73 188C96 146 118 99 158 31C187 80 201 131 218 181&quot;/&gt;
             &lt;path class=&quot;ml-base ml-c4-base&quot; d=&quot;M53 148C105 150 147 125 191 83&quot;/&gt;
